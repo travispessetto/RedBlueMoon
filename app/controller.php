@@ -1,11 +1,13 @@
 <?php
-
+//Phar::mount('outside','./');
+Phar::mount('database.sql','./database.sql');
+Phar::mount('wordpress.zip','./wordpress.zip');
 header('Content-Type: application/json');
 $action = $_GET['action'];
 
 if($action == 'checkFolder')
 {
-    if(is_writable('.'))
+    if(is_writable('./outside'))
     {
         echo json_encode(array('writable'=>'true'));
     }
@@ -28,6 +30,8 @@ if($action == 'importDatabase')
         $server = $_POST['databaseServer'];
         $username = $_POST['databaseUser'];
         $password = $_POST['databasePassword'];
+        $oldUrl = $_POST['oldUrl'];
+        $newUrl = $_POST['newUrl'];
         $conn = new mysqli($server, $username, $password);
         $conn->select_db($database);
         $lines = file('database.sql');
@@ -44,6 +48,7 @@ if($action == 'importDatabase')
                     continue;
 
                 // Add this line to the current segment
+                $line = str_replace($oldUrl,$newUrl,$line);
                 $query .= $line;
                 // If it has a semicolon at the end, it's the end of the query
                 if (substr(trim($line), -1, 1) == ';')
@@ -70,6 +75,10 @@ if($action == 'extract')
     }
     else
     {
+        $database = $_POST['database'];
+        $server = $_POST['databaseServer'];
+        $username = $_POST['databaseUser'];
+        $password = $_POST['databasePassword'];
         $zip = new ZipArchive;
         $zip->open('wordpress.zip');
         if($zip === false)
@@ -80,6 +89,15 @@ if($action == 'extract')
         {
             $zip->extractTo('./');
             $zip->close();
+            Phar::mount('wp-config-sample.php','wp-config-sample.php');
+            Phar::mount('wp-config.php','wp-config.php');
+            unlink();
+            $configContent = file_get_contents('wp-config-sample.php');
+            $configContent = str_replace('username_here',$username,$configContent);
+            $configContent = str_replace('password_here',$password,$configContent);
+            $configContent = str_replace('localhost',$server,$configContent);
+            $configContent = str_replace('database_name_here',$configContent);
+            file_put_contents('wp-config.php',$configContent);
             echo json_encode(array('extracted'=>true));
         }
     }

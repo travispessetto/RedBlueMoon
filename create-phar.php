@@ -28,4 +28,4 @@ $p->setDefaultStub('index.php', '/index.php');
 // plus - compressing it into gzip  
 $p->compress(Phar::GZ);
    
-echo "$pharFile successfully created";
+echo "$pharFile successfully created".PHP_EOL;

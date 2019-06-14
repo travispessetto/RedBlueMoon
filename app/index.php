@@ -28,10 +28,17 @@
             <div id="fields">
 
             <div>
-                <label><?php echo $message['url']; ?></label>
+                <label><?php echo $message['old_url']; ?></label>
             </div>
             <div>
-                <input name="url" placeholder="<?php echo $message['url_placeholder']; ?>" />
+                <input name="old_url" placeholder="<?php echo $message['old_url_placeholder']; ?>" />
+            </div>
+
+            <div>
+                <label><?php echo $message['new_url']; ?></label>
+            </div>
+            <div>
+                <input name="new_url" placeholder="<?php echo $message['new_url_placeholder']; ?>" />
             </div>
 
             <div>
@@ -73,9 +80,6 @@
             </div>
             <div>
                 <span id="database-import" class="todo"><i class="fas fa-circle-notch fa-spin"></i></span>&nbsp;<?php echo $message['database_import']; ?>
-            </div>
-            <div>
-                <span id="url-changed" class="todo"><i class="fas fa-circle-notch fa-spin"></i></span>&nbsp;<?php echo $message['url_changed']; ?>
             </div>
             <div>
                 <span id="files-extracted" class="todo"><i class="fas fa-circle-notch fa-spin"></i></span>&nbsp;<?php echo $message['files_extracted']; ?>

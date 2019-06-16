@@ -89,16 +89,28 @@ if($action == 'extract')
         {
             $zip->extractTo('./');
             $zip->close();
-            Phar::mount('wp-config-sample.php','wp-config-sample.php');
             Phar::mount('wp-config.php','wp-config.php');
-            unlink();
-            $configContent = file_get_contents('wp-config-sample.php');
-            $configContent = str_replace('username_here',$username,$configContent);
-            $configContent = str_replace('password_here',$password,$configContent);
-            $configContent = str_replace('localhost',$server,$configContent);
-            $configContent = str_replace('database_name_here',$configContent);
-            file_put_contents('wp-config.php',$configContent);
-            echo json_encode(array('extracted'=>true));
+            $configContent = file_get_contents('wp-config.php');
+            $configContent = change_define_value('DB_NAME',$database,$configContent);
+            $configContent = change_define_value('DB_USER',$username,$configContent);
+            $configContent = change_define_value('DB_PASSWORD',$password,$configContent);
+            $configContent = change_define_value('DB_HOST',$server,$configContent);
+            
+            if($configContent == null)
+            {
+                echo json_encode(array('extracted'=>false, 'message'=>'Could not replace values in config file'));
+            }
+            else
+            {
+                file_put_contents('wp-config.php',$configContent);
+                echo json_encode(array('extracted'=>true));
+            }
         }
     }
+}
+
+function change_define_value($variable,$value,$configContent)
+{
+    $configContent = preg_replace('/(.*?define\(\s*?\''.$variable.'\'\s*?,\s*?\').*?(\'.*?)/is',"$1$value$2",$configContent);
+    return $configContent;
 }
